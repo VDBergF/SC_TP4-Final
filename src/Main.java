@@ -8,8 +8,10 @@ public class Main {
         System.out.println("Bem vindo ao prompt de comando!\nDigite 'info' para listar os comandos disponiveis" );
 
         Commands commands = new Commands();
-        String[] input = read.nextLine().split(" ");
+        System.out.print(Commands.lvlShell + "@:~$ ");
 
+        String[] input = read.nextLine().split(" ");
+        String p = "";
         while (!input[0].toLowerCase().equals("exit")) {
             switch (input[0].toLowerCase()) {
                 case "info":
@@ -26,12 +28,18 @@ public class Main {
                     System.out.println(commands.ls());
                     break;
                 case "cd":
-                    commands.cd(input[1]);
+                    p = commands.cd(input[1]);
                     break;
                 default:
                     break;
             }
+            if (p == null || p.isEmpty())
+                System.out.print(Commands.lvlShell + "@:~$ ");
+            else
+                System.out.print(Commands.lvlShell + "@:~/" + p + "$ ");
+
             input = read.nextLine().split(" ");
         }
+
     }
 }

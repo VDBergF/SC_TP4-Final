@@ -1,9 +1,15 @@
 import java.io.*;
+import java.sql.Connection;
 
 /**
  * Created by berg on 06/02/17.
  */
 public class Commands {
+    public static String lvlShell = System.getProperty ("user.name");
+    public static String currentDir = System.getProperty("user.home");
+
+    public Commands() {
+    }
 
     public String listCommands() {
         return "-> pwd\n-> cat\n-> ls\n-> cd";
@@ -30,7 +36,7 @@ public class Commands {
 
     public String ls() {
         String r = "";
-        File dir = new File(System.getProperty("user.dir"));
+        File dir = new File(System.getProperty("user.home"));
         String childs[] = dir.list();
         for(String child: childs){
             if (r.isEmpty()) r += child;
@@ -39,12 +45,14 @@ public class Commands {
         return r;
     }
 
-    public void cd(String d) {
+    public String cd(String d) {
         File dir = new File(d);
         if(dir.isDirectory()) {
-            System.setProperty("user.dir", dir.getAbsolutePath());
+            System.setProperty("user.home", dir.getAbsolutePath());
+            return d;
         } else {
-            System.out.println(d + "is not a directory.");
+            System.out.println(d + " is not a directory.");
         }
+        return null;
     }
 }
