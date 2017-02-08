@@ -18,8 +18,7 @@ public class Main {
                     System.out.println(commands.listCommands());
                     break;
                 case "pwd":
-                    String pwd = System.getProperty("user.dir");
-                    System.out.println(pwd);
+                    System.out.println(commands.pwd());
                     break;
                 case "cat":
                     System.out.println(commands.cat(input[1]));
@@ -29,6 +28,9 @@ public class Main {
                     break;
                 case "cd":
                     p = commands.cd(input[1]);
+                    break;
+                case "clear":
+                    commands.clear();
                     break;
                 default:
                     break;

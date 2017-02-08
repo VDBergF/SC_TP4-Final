@@ -12,7 +12,7 @@ public class Commands {
     }
 
     public String listCommands() {
-        return "-> pwd\n-> cat\n-> ls\n-> cd";
+        return "-> pwd\n-> cat\n-> ls\n-> cd\n-> exit\n-> clear";
     }
 
     public String cat(String file) {
@@ -36,7 +36,7 @@ public class Commands {
 
     public String ls() {
         String r = "";
-        File dir = new File(System.getProperty("user.home"));
+        File dir = new File(System.getProperty("user.dir"));
         String childs[] = dir.list();
         for(String child: childs){
             if (r.isEmpty()) r += child;
@@ -48,11 +48,20 @@ public class Commands {
     public String cd(String d) {
         File dir = new File(d);
         if(dir.isDirectory()) {
-            System.setProperty("user.home", dir.getAbsolutePath());
+            System.setProperty("user.dir", dir.getAbsolutePath());
             return d;
         } else {
             System.out.println(d + " is not a directory.");
         }
         return null;
+    }
+    public void clear() {
+        for (int i = 0; i < 54; i++) {
+            System.out.println("\n");
+        }
+    }
+
+    public String pwd() {
+        return System.getProperty("user.dir");
     }
 }
