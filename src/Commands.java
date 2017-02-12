@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.InetAddress;
 import java.sql.Connection;
 import java.util.Properties;
 
@@ -6,8 +7,16 @@ import java.util.Properties;
  * Created by berg on 06/02/17.
  */
 public class Commands {
-    public static String lvlShell = System.getProperty ("user.name") + "@:~";
+    public static String lvlShell;
     public static String currentDir = System.getProperty("user.home");
+
+    static {
+        try{
+            lvlShell = System.getProperty ("user.name") + "@" + InetAddress.getLocalHost().getHostName() + ":~";
+        }catch (Exception e){
+            System.out.println("Exception caught ="+e.getMessage());
+        }
+    }
 
     public Commands() {
     }
