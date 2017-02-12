@@ -74,6 +74,7 @@ public class Main extends JFrame {
                 case "exit":
                     System.exit(0);
                 default:
+                    System.out.println(concatStr(input, 0) + ": comando não encontrado");
                     break;
             }
             if (p == null || p.isEmpty())

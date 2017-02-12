@@ -2,6 +2,8 @@ import java.io.*;
 import java.net.InetAddress;
 import java.sql.Connection;
 import java.util.Properties;
+import java.util.Scanner;
+import java.util.zip.InflaterInputStream;
 
 /**
  * Created by berg on 06/02/17.
@@ -19,6 +21,7 @@ public class Commands {
     }
 
     public Commands() {
+
     }
 
     public String listCommands() {
@@ -37,8 +40,7 @@ public class Commands {
             }
         } catch (FileNotFoundException ex) {
             System.out.println(file+", file not found.");
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             System.out.println(file+", input/output error.");
         }
         return r;
