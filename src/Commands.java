@@ -67,7 +67,7 @@ public class Commands {
     }
 
     public void clear() {
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < 27; i++) {
             System.out.println("\n");
         }
     }
@@ -102,6 +102,7 @@ public class Commands {
     }
 
     public void mv(String from, String to) {
+        // diretorio de origem
         File arq = new File(currentDir + "/" + from);
         // diretorio de destino
         File dir = new File(to);

@@ -47,7 +47,7 @@ public class Main extends JFrame {
                     System.out.println(commands.pwd());
                     break;
                 case "cat":
-                    System.out.println(commands.cat(input[1]));
+                    System.out.println(commands.cat(concatStr(input, 1)));
                     break;
                 case "ls":
                     System.out.println(commands.ls());
@@ -55,20 +55,20 @@ public class Main extends JFrame {
                 case "cd":
                     if (input[1].equals(".."))
                         commands.cdBack();
-                    else p = commands.cd(input[1]);
+                    else p = commands.cd(concatStr(input, 1));
                     break;
                 case "clear":
                     commands.clear();
                     break;
                 case "rm":
-                    if (input[1].equals("-r")) commands.rm(input[2]);
+                    if (input[1].equals("-r")) commands.rm(concatStr(input, 2));
                     break;
                 case "mkdir":
-                    if (input[1].equals("-p")) commands.mkdir(input[2], true);
-                    else commands.mkdir(input[1], false);
+                    if (input[1].equals("-p")) commands.mkdir(concatStr(input, 2), true);
+                    else commands.mkdir(concatStr(input, 1), false);
                     break;
                 case "mv":
-                    commands.mv(input[1], input[2]);
+                    commands.mv(input[1], concatStr(input, 2));
                     break;
                 case "exit":
                     System.exit(0);
@@ -83,5 +83,14 @@ public class Main extends JFrame {
             input = read.nextLine().split(" ");
         }
 
+    }
+
+    public static String concatStr(String[] input, int init) {
+        String r = "";
+        for (int i = init; i < input.length; i++) {
+            if (r.isEmpty()) r += input[i];
+            else r += " " + input[i];
+        }
+        return r;
     }
 }
