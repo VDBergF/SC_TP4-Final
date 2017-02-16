@@ -35,7 +35,7 @@ public class Main extends JFrame {
 //        t.add(t.jTextArea);
 
         Commands commands = new Commands();
-        System.out.print(Commands.showName + Commands.lvlShell + "$ ");
+        System.out.print(commands.getDisplayInfo());
 
         String[] input = read.nextLine().split(" ");
         String p = "";
@@ -48,37 +48,34 @@ public class Main extends JFrame {
                     System.out.println(commands.pwd());
                     break;
                 case "cat":
-                    System.out.println(commands.cat(concatStr(input, 1)));
+                    System.out.println(commands.cat(concatStr(input, 1).split(" ")));
                     break;
                 case "ls":
                     System.out.println(commands.ls());
                     break;
                 case "cd":
-                    if (input[1].equals(".."))
-                        commands.cdBack();
-                    else commands.cd(concatStr(input, 1), false);
+                    commands.cd(concatStr(input, 1));
                     break;
                 case "clear":
                     commands.clear();
                     break;
                 case "rm":
-                    if (input[1].equals("-r")) commands.rm(concatStr(input, 2));
+                    commands.rm(concatStr(input, 1));
                     break;
                 case "mkdir":
-                    if (input[1].equals("-p")) commands.mkdir(concatStr(input, 2), true);
-                    else commands.mkdir(concatStr(input, 1), false);
+                    commands.mkdir(concatStr(input, 1));
                     break;
                 case "mv":
-                    commands.mv(input[1], concatStr(input, 2));
+                    commands.mv(input[1], input[2]);
                     break;
                 case "exit":
                     System.exit(0);
                 default:
-                    System.out.println(concatStr(input, 0) + ": comando não encontrado");
+                    System.out.println(input[0] + ": comando não encontrado");
                     break;
             }
 
-            System.out.print(Commands.showName + Commands.lvlShell + "$ ");
+            System.out.print(commands.getDisplayInfo());
 
             input = read.nextLine().split(" ");
         }

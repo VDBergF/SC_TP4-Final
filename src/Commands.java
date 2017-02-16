@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.util.Properties;
 import java.util.Scanner;
@@ -9,32 +10,39 @@ import java.util.zip.InflaterInputStream;
  * Created by berg on 06/02/17.
  */
 public class Commands {
-    public static String lvlShell;
-    public static String currentDir = System.getProperty("user.home") + "/";
-    public static String showName;
-    public static boolean isDirHome = true;
-
-    static {
-        try {
-            lvlShell = "~";
-            showName = System.getProperty ("user.name") + "@" + InetAddress.getLocalHost().getHostName() + ":";
-        } catch (Exception e){
-            System.out.println("Exception caught ="+e.getMessage());
-        }
-    }
+    private String currentDir;
+    private String user;
+    private String host;
+    private String home;
 
     public Commands() {
+        currentDir = home = System.getProperty("user.home");
+        try {
+            host = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        user = System.getProperty ("user.name");
 
     }
 
-    public String listCommands() {
+    String listCommands() {
         return "-> pwd\n-> cat\n-> ls\n-> cd\n-> cd ..\n-> exit\n-> clear\n-> rm -r\n-> mkdir\n-> mkdir -p\n-> mv";
     }
 
-    public String cat(String file) {
+    String cat(String[] files){
+        String result = "";
+        for (String file : files){
+            result += cat(file);
+        }
+        return result;
+    }
+
+    String cat(String file) {
         String r = "";
+        file = absPathFromRelativePath(file);
         try {
-            FileReader fileReader = new FileReader(currentDir + "/" + file);
+            FileReader fileReader = new FileReader(file);
             BufferedReader in = new BufferedReader(fileReader);
             String line;
             while((line = in.readLine())!= null){
@@ -49,89 +57,45 @@ public class Commands {
         return r;
     }
 
-    public String ls() {
+    String ls() {
         String r = "";
         File dir = new File(currentDir);
         String childs[] = dir.list();
         for(String child: childs){
             if (r.isEmpty()) r += child;
-            else r += "\n" + child;
+            else r += !(child.startsWith(".")) ? "\n" + child : "";
         }
         return r;
     }
 
-    public void cd(String d, boolean isBack) {
-
-        File dir = null;
-        if (d.equals("/")) dir = new File(d);
-        else if (d.equals("~")) dir = new File(System.getProperty("user.home") + "/");
-        else {
-            if (d.charAt(d.length()-1) != '/') d += "/";
-            if (isBack) dir = new File(d);
-            else dir = new File(currentDir + d);
-        }
-
-        if(dir.isDirectory()) {
-            System.setProperty("user.dir", dir.getAbsolutePath());
-            if (d.equals("/")) {
-                currentDir = d;
-                lvlShell = "/";
-                isDirHome = false;
-            } else if (d.equals("~")) {
-                currentDir = System.getProperty("user.home") + "/";
-                lvlShell = "~";
-                isDirHome = true;
-            } else {
-                if (!isBack) {
-                    currentDir += d;
-                    lvlShell += lvlShell.equals("/")? d.substring(0, d.length()-1): "/" + d.substring(0, d.length()-1);
-                    if (lvlShell.equals(System.getProperty("user.home"))) lvlShell = "~";
-                } else {
-                    currentDir = d;
-                    if (lvlShell.equals("~")) {
-                        int cut = currentDir.lastIndexOf("/");
-                        lvlShell = currentDir.substring(0, cut);
-                    } else {
-                        int cut = lvlShell.lastIndexOf("/");
-                        lvlShell = lvlShell.substring(0, cut);
-                    }
-                }
-            }
-        } else {
-            System.out.println(d + " is not a directory.");
-        }
+    void cd(String d) {
+        d = absPathFromRelativePath(d);
+        if(new File(d).exists())
+            currentDir = d;
     }
 
-    public void cdBack() {
-        if (!currentDir.equals("/")) {
-            int cutDir = currentDir.substring(0, currentDir.length()-1).lastIndexOf("/");
-            if (cutDir == 0) cd("/", true);
-            else cd(currentDir.substring(0,cutDir), true);
-        }
-    }
-
-    public void clear() {
+    void clear() {
         for (int i = 0; i < 27; i++) {
             System.out.println("\n");
         }
     }
 
-    public String pwd() {
-        if (!currentDir.equals("/")) return currentDir.substring(0, currentDir.length()-1);
+    String pwd() {
         return currentDir;
     }
 
-    public void mkdir(String name, boolean subdir) {
+    void mkdir(String name) {
+        name = absPathFromRelativePath(name);
         try {
-            File dir = new File(currentDir + "/" + name);
-            if (subdir) dir.mkdirs();
-            else dir.mkdir();
+            File dir = new File(name);
+            dir.mkdirs();
         } catch (Exception ex) {
             System.out.println("Erro ao criar o diretorio");
         }
     }
 
-    public void rm(String path) {
+    void rm(String path) {
+        path = absPathFromRelativePath(path);
         File file = new File(path);
         rm(file);
     }
@@ -146,12 +110,46 @@ public class Commands {
         f.delete();
     }
 
-    public void mv(String from, String to) {
+    void mv(String from, String to) {
         // diretorio de origem
-        File arq = new File(currentDir + "/" + from);
+
+        from = absPathFromRelativePath(from);
+        to = absPathFromRelativePath(to);
+
+        File arq = new File(from);
         // diretorio de destino
         File dir = new File(to);
         // move o arquivo para o novo diretorio
         arq.renameTo(new File(dir, arq.getName()));
+    }
+
+
+    String absPathFromRelativePath(String path){
+
+        //System.out.println("CURRENT -> " + currentDir);
+        //System.out.println("DESTINATION -> " + path);
+
+        // ja eh absoluto
+        if(path.charAt(0) == '/') return path;
+
+        File a = new File(currentDir);
+        File b = new File(a, path);
+        String absolute = null;
+        try {
+            absolute = b.getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //System.out.println("ABSOLUTE -> " + absolute);
+        return absolute;
+    }
+
+    String getDisplayInfo(){
+        String pwd = currentDir;
+        if(currentDir.startsWith(home)){
+            pwd = currentDir.replace(home, "~");
+        }
+        return user + '@' + host + ':' + pwd + "$ ";
     }
 }
