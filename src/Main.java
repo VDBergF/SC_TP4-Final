@@ -35,7 +35,7 @@ public class Main extends JFrame {
 //        t.add(t.jTextArea);
 
         Commands commands = new Commands();
-        System.out.print(Commands.lvlShell + "$ ");
+        System.out.print(Commands.showName + Commands.lvlShell + "$ ");
 
         String[] input = read.nextLine().split(" ");
         String p = "";
@@ -56,7 +56,7 @@ public class Main extends JFrame {
                 case "cd":
                     if (input[1].equals(".."))
                         commands.cdBack();
-                    else p = commands.cd(concatStr(input, 1));
+                    else commands.cd(concatStr(input, 1), false);
                     break;
                 case "clear":
                     commands.clear();
@@ -77,10 +77,8 @@ public class Main extends JFrame {
                     System.out.println(concatStr(input, 0) + ": comando não encontrado");
                     break;
             }
-            if (p == null || p.isEmpty())
-                System.out.print(Commands.lvlShell + "$ ");
-            else
-                System.out.print(Commands.lvlShell + "$ ");
+
+            System.out.print(Commands.showName + Commands.lvlShell + "$ ");
 
             input = read.nextLine().split(" ");
         }
@@ -95,4 +93,5 @@ public class Main extends JFrame {
         }
         return r;
     }
+
 }

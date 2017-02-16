@@ -10,12 +10,15 @@ import java.util.zip.InflaterInputStream;
  */
 public class Commands {
     public static String lvlShell;
-    public static String currentDir = System.getProperty("user.home");
+    public static String currentDir = System.getProperty("user.home") + "/";
+    public static String showName;
+    public static boolean isDirHome = true;
 
     static {
-        try{
-            lvlShell = System.getProperty ("user.name") + "@" + InetAddress.getLocalHost().getHostName() + ":~";
-        }catch (Exception e){
+        try {
+            lvlShell = "~";
+            showName = System.getProperty ("user.name") + "@" + InetAddress.getLocalHost().getHostName() + ":";
+        } catch (Exception e){
             System.out.println("Exception caught ="+e.getMessage());
         }
     }
@@ -57,24 +60,54 @@ public class Commands {
         return r;
     }
 
-    public String cd(String d) {
-        File dir = new File(currentDir + "/" + d);
+    public void cd(String d, boolean isBack) {
+
+        File dir = null;
+        if (d.equals("/")) dir = new File(d);
+        else if (d.equals("~")) dir = new File(System.getProperty("user.home") + "/");
+        else {
+            if (d.charAt(d.length()-1) != '/') d += "/";
+            if (isBack) dir = new File(d);
+            else dir = new File(currentDir + d);
+        }
+
         if(dir.isDirectory()) {
             System.setProperty("user.dir", dir.getAbsolutePath());
-            currentDir += "/" + d;
-            lvlShell += "/" + d;
-            return d;
+            if (d.equals("/")) {
+                currentDir = d;
+                lvlShell = "/";
+                isDirHome = false;
+            } else if (d.equals("~")) {
+                currentDir = System.getProperty("user.home") + "/";
+                lvlShell = "~";
+                isDirHome = true;
+            } else {
+                if (!isBack) {
+                    currentDir += d;
+                    lvlShell += lvlShell.equals("/")? d.substring(0, d.length()-1): "/" + d.substring(0, d.length()-1);
+                    if (lvlShell.equals(System.getProperty("user.home"))) lvlShell = "~";
+                } else {
+                    currentDir = d;
+                    if (lvlShell.equals("~")) {
+                        int cut = currentDir.lastIndexOf("/");
+                        lvlShell = currentDir.substring(0, cut);
+                    } else {
+                        int cut = lvlShell.lastIndexOf("/");
+                        lvlShell = lvlShell.substring(0, cut);
+                    }
+                }
+            }
         } else {
             System.out.println(d + " is not a directory.");
         }
-        return null;
     }
 
     public void cdBack() {
-        int cut = lvlShell.lastIndexOf("/");
-        int cutDir = currentDir.lastIndexOf("/");
-        lvlShell = lvlShell.substring(0, cut);
-        currentDir = currentDir.substring(0,cutDir);
+        if (!currentDir.equals("/")) {
+            int cutDir = currentDir.substring(0, currentDir.length()-1).lastIndexOf("/");
+            if (cutDir == 0) cd("/", true);
+            else cd(currentDir.substring(0,cutDir), true);
+        }
     }
 
     public void clear() {
@@ -84,6 +117,7 @@ public class Commands {
     }
 
     public String pwd() {
+        if (!currentDir.equals("/")) return currentDir.substring(0, currentDir.length()-1);
         return currentDir;
     }
 
