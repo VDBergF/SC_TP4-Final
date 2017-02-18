@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * Created by berg on 06/02/17.
  */
 public class Commands {
-    private String currentDir;
+    private static String currentDir;
     private String user;
     private String host;
     private String home;
@@ -197,10 +197,13 @@ public class Commands {
     }
 
 
-    private String absPathFromRelativePath(String path){
+    String absPathFromRelativePath(String path){
 
         // ja eh absoluto
         if(path.charAt(0) == '/') return path;
+
+
+        if(path.charAt(0) == '~') return home + path.substring(1);
 
         File a = new File(currentDir);
         File b = new File(a, path);

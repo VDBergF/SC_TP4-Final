@@ -48,20 +48,40 @@ public class Main extends JFrame {
 
             input = read.nextLine();
 
-            if(input.contains("|")){ // rolou um pipe
-                pipe_steps = input.split("\\|");
+            boolean saveToFile = false;
+            String path_to_save = "";
+            int last_element = 0;
+
+            if(input.contains(">")){
+                last_element = -1;
+                saveToFile = true;
+            }
+
+            if(input.contains("|") || saveToFile){ // rolou um pipe ou redirect
+                pipe_steps = input.split("[\\|>]");
 
                 removeTrailingSpaces(pipe_steps);
 
-                for (String step : pipe_steps){
-                    processCommand(step.split(" "));
+                // se houve um redirect, o ultimo bagulho eh o caminho do arquivo para salvar o buffer
+                for (int i = 0; i < pipe_steps.length + last_element; i++) {
+                    processCommand(pipe_steps[i].split(" "));
                 }
+
+                if(saveToFile){
+                    path_to_save = commands.absPathFromRelativePath(pipe_steps[pipe_steps.length - 1]);
+                }
+
             }else {
+                // o cara nao fez pipe nem redirect, so roda o comando
                 input_splitted = input.split(" ");
                 processCommand(input_splitted);
             }
 
-            System.out.println(buffer);
+            if(saveToFile){
+                buffer.saveToFile(path_to_save);
+            }else {
+                System.out.println(buffer);
+            }
 
             buffer.clear();
         }
