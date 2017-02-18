@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 public class Main extends JFrame {
     private JTextArea jTextArea;
+    private static Commands commands = new Commands();
+    private static Buffer buffer = new Buffer();
 
     public Main() {
         super("Terminal");
@@ -34,52 +36,91 @@ public class Main extends JFrame {
 //        t.jTextArea.setText(welcome);
 //        t.add(t.jTextArea);
 
-        Commands commands = new Commands();
-        System.out.print(commands.getDisplayInfo());
 
-        String[] input = read.nextLine().split(" ");
+        String input;
+        String[] pipe_steps;
+        String[] input_splitted;
+
         String p = "";
         while (true) {
-            switch (input[0].toLowerCase()) {
-                case "info":
-                    System.out.println(commands.listCommands());
-                    break;
-                case "pwd":
-                    System.out.println(commands.pwd());
-                    break;
-                case "cat":
-                    System.out.println(commands.cat(concatStr(input, 1).split(" ")));
-                    break;
-                case "ls":
-                    System.out.println(commands.ls());
-                    break;
-                case "cd":
-                    commands.cd(concatStr(input, 1));
-                    break;
-                case "clear":
-                    commands.clear();
-                    break;
-                case "rm":
-                    commands.rm(concatStr(input, 1));
-                    break;
-                case "mkdir":
-                    commands.mkdir(concatStr(input, 1));
-                    break;
-                case "mv":
-                    commands.mv(input[1], input[2]);
-                    break;
-                case "exit":
-                    System.exit(0);
-                default:
-                    System.out.println(input[0] + ": comando não encontrado");
-                    break;
-            }
-
+            // mostra o console
             System.out.print(commands.getDisplayInfo());
 
-            input = read.nextLine().split(" ");
+            input = read.nextLine();
+
+            if(input.contains("|")){ // rolou um pipe
+                pipe_steps = input.split("\\|");
+
+                removeTrailingSpaces(pipe_steps);
+
+                for (String step : pipe_steps){
+                    processCommand(step.split(" "));
+                }
+            }else {
+                input_splitted = input.split(" ");
+                processCommand(input_splitted);
+            }
+
+            System.out.println(buffer);
+
+            buffer.clear();
         }
 
+    }
+
+    private static void removeTrailingSpaces(String[] input){
+        for (int i = 0; i < input.length; i++) {
+            input[i] = input[i].trim();
+        }
+    }
+
+    private static void processCommand(String[] input){
+        removeTrailingSpaces(input);
+        switch (input[0].toLowerCase()) {
+            case "info":
+                buffer.append(commands.listCommands());
+                break;
+            case "pwd":
+                buffer.append(commands.pwd());
+                break;
+            case "cat":
+                buffer.append(commands.cat(concatStr(input, 1).split(" ")));
+                break;
+            case "ls":
+                buffer.append(commands.ls());
+                break;
+            case "cd":
+                buffer.append(commands.cd(concatStr(input, 1)));
+                break;
+            case "clear":
+                buffer.append(commands.clear());
+                break;
+            case "rm":
+                buffer.append(commands.rm(concatStr(input, 1)));
+                break;
+            case "mkdir":
+                buffer.append(commands.mkdir(concatStr(input, 1)));
+                break;
+            case "mv":
+                buffer.append(commands.mv(input[1], input[2]));
+                break;
+            case "exit":
+                System.exit(0);
+                break;
+            case "grep":
+                if(!buffer.isEmpty()){
+                    buffer.append(commands.grep(buffer.read(), concatStr(input, 1)));
+                }else{
+                    buffer.append(commands.grep(input[1], concatStr(input, 2)));
+                }
+                break;
+            case "touch":
+                buffer.append(commands.touch(concatStr(input, 1)));
+                break;
+            default:
+                System.out.println(input[0] + ": comando não encontrado");
+                break;
+        }
     }
 
     public static String concatStr(String[] input, int init) {
