@@ -38,6 +38,9 @@ public class Commands {
         list.add("-> clear");
         list.add("-> rm");
         list.add("-> mkdir");
+        list.add("-> grep");
+        list.add("-> | (pipe)");
+        list.add("-> > (redirect)");
         list.add("-> mv");
 
         return list;

@@ -83,8 +83,10 @@ public class Main extends JFrame {
 
             }else {
                 // o cara nao fez pipe nem redirect, so roda o comando
+                logger.logCommand(input);
                 input_splitted = input.split(" ");
                 processCommand(input_splitted);
+                logger.logBufferState(buffer.getState());
             }
 
             if(saveToFile){
