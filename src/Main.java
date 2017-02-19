@@ -8,6 +8,8 @@ public class Main extends JFrame {
     private JTextArea jTextArea;
     private static Commands commands = new Commands();
     private static Buffer buffer = new Buffer();
+    private static Logger logger = new Logger();
+
 
     public Main() {
         super("Terminal");
@@ -42,12 +44,16 @@ public class Main extends JFrame {
         String[] input_splitted;
 
         String p = "";
+
         while (true) {
             // mostra o console
             System.out.print(commands.getDisplayInfo());
 
             input = read.nextLine();
 
+            logger.logCommand(input);
+
+            // baguios de controle para o redirect '>'
             boolean saveToFile = false;
             String path_to_save = "";
             int last_element = 0;
@@ -57,14 +63,18 @@ public class Main extends JFrame {
                 saveToFile = true;
             }
 
-            if(input.contains("|") || saveToFile){ // rolou um pipe ou redirect
+            if(input.contains("|") || saveToFile){ // rolou um pipe ou redirect, saida precisa ser quebrada
                 pipe_steps = input.split("[\\|>]");
+
+
 
                 removeTrailingSpaces(pipe_steps);
 
                 // se houve um redirect, o ultimo bagulho eh o caminho do arquivo para salvar o buffer
                 for (int i = 0; i < pipe_steps.length + last_element; i++) {
+                    logger.logCommand(pipe_steps[i]);
                     processCommand(pipe_steps[i].split(" "));
+                    logger.logBufferState(buffer.getState());
                 }
 
                 if(saveToFile){
@@ -125,6 +135,7 @@ public class Main extends JFrame {
                 buffer.append(commands.mv(input[1], input[2]));
                 break;
             case "exit":
+                logger.saveToFile("/home/cassiano/logsSC/log" + System.currentTimeMillis() % 100000 + ".txt");
                 System.exit(0);
                 break;
             case "grep":

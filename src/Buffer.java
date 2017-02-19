@@ -57,4 +57,8 @@ public class Buffer {
             e.printStackTrace();
         }
     }
+
+    public LinkedList<String> getState(){
+        return buffer;
+    }
 }

@@ -202,12 +202,13 @@ public class Commands {
         // ja eh absoluto
         if(path.charAt(0) == '/') return path;
 
-
+        // eh home
         if(path.charAt(0) == '~') return home + path.substring(1);
 
         File a = new File(currentDir);
         File b = new File(a, path);
         String absolute = null;
+
         try {
             absolute = b.getCanonicalPath();
         } catch (IOException e) {
