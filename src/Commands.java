@@ -42,6 +42,7 @@ public class Commands {
         list.add("-> | (pipe)");
         list.add("-> > (redirect)");
         list.add("-> mv");
+        list.add("-> exec program params ...");
 
         return list;
     }
