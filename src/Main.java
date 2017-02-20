@@ -134,10 +134,11 @@ public class Main extends JFrame {
                 buffer.append(commands.mkdir(concatStr(input, 1)));
                 break;
             case "mv":
-                buffer.append(commands.mv(input[1], input[2]));
+                if (input.length > 1) buffer.append(commands.mv(input[1], input[2]));
+                else System.out.println("mv: falta operando");
                 break;
             case "exit":
-                logger.saveToFile("/home/cassiano/logsSC/log" + System.currentTimeMillis() % 100000 + ".txt");
+                logger.saveToFile(System.getProperty("user.home") + System.currentTimeMillis() % 100000 + ".txt");
                 System.exit(0);
                 break;
             case "grep":

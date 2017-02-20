@@ -55,6 +55,11 @@ public class Commands {
     }
 
     LinkedList<String> cat(String file) {
+        if (file == null || file.isEmpty()) {
+            System.out.println("cat: falta operando");
+            return new LinkedList<>();
+        }
+
         file = absPathFromRelativePath(file);
         LinkedList<String> strs = new LinkedList<>();
         try {
@@ -112,6 +117,8 @@ public class Commands {
     }
 
     LinkedList<String> cd(String d) {
+        if (d == null || d.isEmpty()) d = System.getProperty("user.home");
+
         d = absPathFromRelativePath(d);
         if(new File(d).exists())
             currentDir = d;
@@ -120,6 +127,11 @@ public class Commands {
     }
 
     LinkedList<String> touch(String path) {
+        if (path == null || path.isEmpty()) {
+            System.out.println("touch: falta operando");
+            return new LinkedList<>();
+        }
+
         path = absPathFromRelativePath(path);
 
         File f = new File(path);
@@ -154,6 +166,11 @@ public class Commands {
     }
 
     LinkedList<String> mkdir(String name) {
+        if (name == null || name.isEmpty()) {
+            System.out.println("mkdir: falta operando");
+            return new LinkedList<>();
+        }
+
         name = absPathFromRelativePath(name);
         try {
             File dir = new File(name);
@@ -166,6 +183,11 @@ public class Commands {
     }
 
     LinkedList<String> rm(String path) {
+        if (path == null || path.isEmpty()) {
+            System.out.println("rm: falta operando");
+            return new LinkedList<>();
+        }
+
         path = absPathFromRelativePath(path);
         File file = new File(path);
 
@@ -185,8 +207,12 @@ public class Commands {
     }
 
     LinkedList<String> mv(String from, String to) {
-        // diretorio de origem
+        if (to == null || to.isEmpty()) {
+            System.out.println("mv: falta operando");
+            return new LinkedList<>();
+        }
 
+        // diretorio de origem
         from = absPathFromRelativePath(from);
         to = absPathFromRelativePath(to);
 
@@ -206,7 +232,7 @@ public class Commands {
         if(path.charAt(0) == '/') return path;
 
         // eh home
-        if(path.charAt(0) == '~') return home + path.substring(1);
+        if(path.charAt(0) == '~' || path.charAt(0) == '"') return home + path.substring(1);
 
         File a = new File(currentDir);
         File b = new File(a, path);
