@@ -138,7 +138,7 @@ public class Main extends JFrame {
                 else System.out.println("mv: falta operando");
                 break;
             case "exit":
-                logger.saveToFile(System.getProperty("user.home") + System.currentTimeMillis() % 100000 + ".txt");
+                logger.saveToFile(commands.getHome() + System.currentTimeMillis() / 1000 + ".txt");
                 System.exit(0);
                 break;
             case "grep":
@@ -150,6 +150,17 @@ public class Main extends JFrame {
                 break;
             case "touch":
                 buffer.append(commands.touch(concatStr(input, 1)));
+                break;
+            case "exec":
+
+                String[] program_plus_args = new String[input.length - 1];
+
+                for (int i = 1; i < input.length; i++) {
+                    program_plus_args[i - 1] = input[i];
+                }
+
+                buffer.append(commands.exec(program_plus_args));
+
                 break;
             default:
                 System.out.println(input[0] + ": comando não encontrado");

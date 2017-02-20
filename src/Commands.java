@@ -54,6 +54,34 @@ public class Commands {
         return result;
     }
 
+    LinkedList<String> exec(String[] program_params){
+        Process process = null;
+
+        try {
+            program_params[0] = absPathFromRelativePath(program_params[0]);
+            process = new ProcessBuilder(program_params).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        InputStream is = process.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+        String line;
+
+        LinkedList<String> output = new LinkedList<>();
+
+        try {
+            while ((line = br.readLine()) != null) {
+                output.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return output;
+    }
+
     LinkedList<String> cat(String file) {
         if (file == null || file.isEmpty()) {
             System.out.println("cat: falta operando");
@@ -253,5 +281,9 @@ public class Commands {
             pwd = currentDir.replace(home, "~");
         }
         return user + '@' + host + ':' + pwd + "$ ";
+    }
+
+    public String getHome() {
+        return home;
     }
 }
